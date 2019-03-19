@@ -1,7 +1,9 @@
 # HottestCityBot-script
 A Twitter bot designed to run on AWS lambda that settles the age-old dispute of who's weather is hotter, every day.
 
-Very similar to [my other Twitter bot for posting the hottest city](https://github.com/SamWittmann/hottestCityBot), just crammed into one Python file and designed to run on AWS lambda.
+Calculates which of the top 1,000 cities by population in the U.S. has the highest heat index each afternoon, and tweets the result [@hottest_city](https://twitter.com/hottest_city).
+
+Very similar to [my previous Twitter bot for posting the hottest city](https://github.com/SamWittmann/hottestCityBot), just crammed into one (far more concise) Python file and designed to run on AWS lambda.
 
 ## APIs and external libraries used
 * [OpenWeatherMap API](https://openweathermap.org/api) for fetching real-time weather data. 
