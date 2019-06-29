@@ -2,7 +2,6 @@ import yaml
 import logging
 import json
 import requests
-import meteocalc
 from requests_oauthlib import OAuth1Session
 from requests import ConnectionError
 from datetime import datetime
@@ -76,7 +75,6 @@ def find_hottest_city_and_temp():
         city_and_state_to_id = json.load(f)
         for city_and_state in city_and_state_to_id.keys():
             temperature = query_temperature(city_and_state_to_id[city_and_state])
-
             if hottest[1] < temperature:
                 hottest = (city_and_state, temperature)
     logger.info("Today's hottest city is: %s - %s F" % (str(hottest[0]), str(round(hottest[1], 2))))
@@ -92,8 +90,31 @@ def query_temperature(city_id):
         weather_data = response.json()
         temperature = int(weather_data['main']['temp_max'])
         humidity = int(weather_data['main']['humidity'])
-        return meteocalc.heat_index(temperature, humidity).f
+        if humidity < 40:
+            return temperature
+        return calculate_heat_index(temperature, humidity)
     else:
         logger.debug("API request for location code %s failed.\nResponse code is %s.",
                           str(city_id), str(response.status_code))
         return -1000
+
+
+def calculate_heat_index(temp, hum):
+    """
+    :param temp: temperature in degrees fahrenheit
+    :param hum: relative humidity as an integer 0-100
+    :return: heat index
+    """
+    humidity = hum
+    temperature = float(temp)
+    c1 = -42.379
+    c2 = 2.04901523
+    c3 = 10.14333127
+    c4 = -0.22475541
+    c5 = -6.83783e-3
+    c6 = -5.481717e-2
+    c7 = 1.22874e-3
+    c8 = 8.5282e-4
+    c9 = -0.00000199
+    return int(round(c1 + (c2*temperature) + (c3*humidity) + (c4*temperature*humidity) + (c5*(temperature**(2))) + (c6*(humidity**(2))) + (c7*(temperature**(2))*humidity) + (c8*temperature*(humidity**(2))) + (c9*(temperature**(2))*(humidity**(2)))))
+
